@@ -1,0 +1,47 @@
+# Archivos de compilación
+/target/
+build/
+out/
+
+# Archivos de dependencias
+*.class
+*.jar
+*.war
+*.ear
+
+# Archivos de logs
+*.log
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Configuraciones locales de IDE
+*.iml
+.idea/
+.vscode/
+*.sw?
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Maven wrapper
+.mvn/
+mvnw
+mvnw.cmd
+
+# Gradle
+.gradle/
+build/
+
+# Variables de entorno
+.env
+application-*.yml
+application-*.properties
+application.properties
+
+# Archivos generados
+/.project
+/.classpath
+/.settings/
