@@ -25,6 +25,7 @@ public class AuthController {
    @PostMapping("/login")
 public ResponseEntity<?> login(@RequestBody Usuario request) {
     String email = request.getEmail().trim();
+
     String password = request.getPassword().trim();
 
     Usuario usuario = usuarioRepository.findByEmail(email);

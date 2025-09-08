@@ -1,61 +1,63 @@
+
 package com.soporteAtenciones.sistemaAtenciones.service;
 
+
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.soporteAtenciones.sistemaAtenciones.exception.ResourceNotFoundException;
+import com.soporteAtenciones.sistemaAtenciones.dtos.tickets.TicketRequestDTO;
+import com.soporteAtenciones.sistemaAtenciones.dtos.tickets.TicketResponseDTO;
+import com.soporteAtenciones.sistemaAtenciones.mappers.TicketMapper;
 import com.soporteAtenciones.sistemaAtenciones.models.Ticket;
 import com.soporteAtenciones.sistemaAtenciones.repository.TicketRepository;
 
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
 @Service
 public class TicketService {
 
-   
+    private final TicketRepository ticketRepository;
+    private final TicketMapper ticketMapper;
+
     @Autowired
-    private TicketRepository ticketRepository;
-
-   public Ticket crearTicket(Ticket ticket) {
-    return ticketRepository.save(ticket);
-}
-
-    public Ticket obtenerTicketPorId(Long id) {
-        return ticketRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket", "id", id));
+    public TicketService(TicketRepository ticketRepository, TicketMapper ticketMapper) {
+        this.ticketRepository = ticketRepository;
+        this.ticketMapper = ticketMapper;
     }
 
-    public List<Ticket> listarTickets() {
-        return ticketRepository.findAll();
+    public List<TicketResponseDTO> findAll() {
+         List<Ticket> tickets = ticketRepository.findAll(); // asegúrate que esto traiga usuario
+    return tickets.stream()
+                  .map(ticketMapper::toResponseDto)
+                  .collect(Collectors.toList());
+}
+    public TicketResponseDTO findById(Long id) {
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket no encontrado con id: " + id));
+        return ticketMapper.toResponseDto(ticket);
     }
 
-  public Ticket actualizarTicket(Long id, Ticket ticketActualizado) {
-    Ticket existente = obtenerTicketPorId(id);
-
-    existente.setTitulo(ticketActualizado.getTitulo());
-    existente.setDescripcion(ticketActualizado.getDescripcion());
-    existente.setEstado(ticketActualizado.getEstado()); // <-- Este era el error
-    existente.setPrioridad(ticketActualizado.getPrioridad());
-    existente.setUsuario(ticketActualizado.getUsuario());
-
-    return ticketRepository.save(existente);
-}
-
-    public void eliminarTicket(Long id) {
-        Ticket existente = obtenerTicketPorId(id);
-        ticketRepository.delete(existente);
+    public TicketResponseDTO save(TicketRequestDTO ticketRequestDTO) {
+        Ticket ticket = ticketMapper.toEntity(ticketRequestDTO);
+        Ticket savedTicket = ticketRepository.save(ticket);
+        return ticketMapper.toResponseDto(savedTicket);
     }
 
-    public List<Ticket> listarTicketsPorUsuario(String email) {
-    return ticketRepository.findByUsuarioEmail(email);
-}
+    public TicketResponseDTO update(Long id, TicketRequestDTO ticketRequestDTO) {
+        Ticket existingTicket = ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket no encontrado con id: " + id));
 
-  public Ticket findById(Long id) {
-        return ticketRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Ticket no encontrado: " + id));
+        ticketMapper.updateEntityFromDto(ticketRequestDTO, existingTicket);
+        Ticket updatedTicket = ticketRepository.save(existingTicket);
+        return ticketMapper.toResponseDto(updatedTicket);
+    }
+
+    public void deleteById(Long id) {
+        if (!ticketRepository.existsById(id)) {
+            throw new RuntimeException("Ticket no encontrado con id: " + id);
+        }
+        ticketRepository.deleteById(id);
     }
 }

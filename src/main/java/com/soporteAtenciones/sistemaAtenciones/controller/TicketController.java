@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.soporteAtenciones.sistemaAtenciones.models.Ticket;
+import com.soporteAtenciones.sistemaAtenciones.dtos.tickets.TicketRequestDTO;
+import com.soporteAtenciones.sistemaAtenciones.dtos.tickets.TicketResponseDTO;
 import com.soporteAtenciones.sistemaAtenciones.service.TicketService;
 
 
@@ -24,49 +24,46 @@ import com.soporteAtenciones.sistemaAtenciones.service.TicketService;
 @CrossOrigin(origins = "http://localhost:4200")
 public class TicketController {
 
-   private final TicketService ticketService;
+
+    private final TicketService ticketService;
 
     public TicketController(TicketService ticketService) {
         this.ticketService = ticketService;
     }
 
-    // Crear ticket
+    // Crear Ticket
     @PostMapping
-    public ResponseEntity<Ticket> crearTicket(@RequestBody Ticket usuario) {
-        Ticket nuevoTicket = ticketService.crearTicket(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoTicket);
+    public ResponseEntity<TicketResponseDTO> crearTiquet(@RequestBody TicketRequestDTO ticketRequestDTO) {
+        TicketResponseDTO nuevoticket = ticketService.save(ticketRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoticket);
     }
 
-    // Obtener usuario por ID
+    // Obtener ticket por ID
     @GetMapping("/{id}")
-    public ResponseEntity<Ticket> obtenerTicketPorId(@PathVariable Long id) {
-        Ticket usuario = ticketService.obtenerTicketPorId(id);
-        return ResponseEntity.ok(usuario);
+    public ResponseEntity<TicketResponseDTO> obtenerTicketPorId(@PathVariable Long id) {
+        TicketResponseDTO ticket = ticketService.findById(id);
+        return ResponseEntity.ok(ticket);
     }
 
-    // Listar todos los ticket
-   @GetMapping
-public ResponseEntity<List<Ticket>> listarTickets(
-        @RequestParam(required = false) String usuario) {
-    if (usuario != null) {
-        return ResponseEntity.ok(ticketService.listarTicketsPorUsuario(usuario));
-    } else {
-        return ResponseEntity.ok(ticketService.listarTickets());
+    // Listar todos los Tickets
+    @GetMapping
+    public ResponseEntity<List<TicketResponseDTO>> listarTickets() {
+        List<TicketResponseDTO> tickets = ticketService.findAll();
+        return ResponseEntity.ok(tickets);
     }
-}
-
 
     // Actualizar ticket
     @PutMapping("/{id}")
-    public ResponseEntity<Ticket> actualizarTicket(@PathVariable Long id, @RequestBody Ticket usuario) {
-        Ticket usuarioActualizado = ticketService.actualizarTicket(id, usuario);
-        return ResponseEntity.ok(usuarioActualizado);
+    public ResponseEntity<TicketResponseDTO> actualizarTicket(@PathVariable Long id,
+        @RequestBody TicketRequestDTO ticketRequestDTO) {
+        TicketResponseDTO ticketActualizado = ticketService.update(id, ticketRequestDTO);
+        return ResponseEntity.ok(ticketActualizado);
     }
 
     // Eliminar ticket
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarTicket(@PathVariable Long id) {
-        ticketService.eliminarTicket(id);
+        ticketService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

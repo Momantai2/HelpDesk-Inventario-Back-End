@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.soporteAtenciones.sistemaAtenciones.models.Prioridad;
+import com.soporteAtenciones.sistemaAtenciones.dtos.tickets.PrioridadRequestDTO;
+import com.soporteAtenciones.sistemaAtenciones.dtos.tickets.PrioridadResponseDTO;
 import com.soporteAtenciones.sistemaAtenciones.service.PrioridadService;
 
 
@@ -23,43 +24,45 @@ import com.soporteAtenciones.sistemaAtenciones.service.PrioridadService;
 @CrossOrigin(origins = "http://localhost:4200")
 public class PrioridadController {
 
-  private final PrioridadService prioridadService;
+    private final PrioridadService prioridadService;
 
     public PrioridadController(PrioridadService prioridadService) {
         this.prioridadService = prioridadService;
     }
 
-    // Crear ticket
+    // Crear Prioridad
     @PostMapping
-    public ResponseEntity<Prioridad> crearPrioridad(@RequestBody Prioridad usuario) {
-        Prioridad nuevoPrioridad = prioridadService.crearPrioridad(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoPrioridad);
+    public ResponseEntity<PrioridadResponseDTO> crearPrioridad(@RequestBody PrioridadRequestDTO prioridadRequestDTO) {
+        PrioridadResponseDTO nuevaprioridad = prioridadService.save(prioridadRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevaprioridad);
     }
 
-    // Obtener usuario por ID
+    // Obtener Prioridad por ID
     @GetMapping("/{id}")
-    public ResponseEntity<Prioridad> obtenerPrioridadPorId(@PathVariable Long id) {
-        Prioridad usuario = prioridadService.obtenerPrioridadPorId(id);
-        return ResponseEntity.ok(usuario);
+    public ResponseEntity<PrioridadResponseDTO> obtenerPrioridadPorId(@PathVariable Long id) {
+        PrioridadResponseDTO prioridad = prioridadService.findById(id);
+        return ResponseEntity.ok(prioridad);
     }
 
-    // Listar todos los ticket
+    // Listar todos los Prioridades
     @GetMapping
-    public ResponseEntity<List<Prioridad>> listarPrioridad() {
-        return ResponseEntity.ok(prioridadService.listarPrioridades());
+    public ResponseEntity<List<PrioridadResponseDTO>> listarPrioridades() {
+        List<PrioridadResponseDTO> prioridades = prioridadService.findAll();
+        return ResponseEntity.ok(prioridades);
     }
 
-    // Actualizar ticket
+    // Actualizar Prioridad
     @PutMapping("/{id}")
-    public ResponseEntity<Prioridad> actualizarPrioridad(@PathVariable Long id, @RequestBody Prioridad usuario) {
-        Prioridad usuarioActualizado = prioridadService.actualizarPrioridad(id, usuario);
-        return ResponseEntity.ok(usuarioActualizado);
+    public ResponseEntity<PrioridadResponseDTO> actualizarPrioridad(@PathVariable Long id,
+        @RequestBody PrioridadRequestDTO prioridadRequestDTO) {
+        PrioridadResponseDTO prioridadActualizado = prioridadService.update(id, prioridadRequestDTO);
+        return ResponseEntity.ok(prioridadActualizado);
     }
 
-    // Eliminar ticket
+    // Eliminar Prioridad
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarPrioridad(@PathVariable Long id) {
-        prioridadService.eliminarPrioridad(id);
+        prioridadService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

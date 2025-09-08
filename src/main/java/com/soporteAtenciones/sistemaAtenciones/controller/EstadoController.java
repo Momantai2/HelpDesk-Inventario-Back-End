@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.soporteAtenciones.sistemaAtenciones.models.Estado;
+import com.soporteAtenciones.sistemaAtenciones.dtos.tickets.EstadoRequestDTO;
+import com.soporteAtenciones.sistemaAtenciones.dtos.tickets.EstadoResponseDTO;
 import com.soporteAtenciones.sistemaAtenciones.service.EstadoService;
 
 @RestController
@@ -22,43 +23,45 @@ import com.soporteAtenciones.sistemaAtenciones.service.EstadoService;
 @CrossOrigin(origins = "http://localhost:4200")
 public class EstadoController {
 
-  private final EstadoService estadoService;
+   private final EstadoService estadoService;
 
     public EstadoController(EstadoService estadoService) {
         this.estadoService = estadoService;
     }
 
-    // Crear ticket
+    // Crear Estado
     @PostMapping
-    public ResponseEntity<Estado> crearEstado(@RequestBody Estado usuario) {
-        Estado nuevoEstado = estadoService.crearEstado(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoEstado);
+    public ResponseEntity<EstadoResponseDTO> crearEstado(@RequestBody EstadoRequestDTO estadoRequestDTO) {
+        EstadoResponseDTO nuevoestado = estadoService.save(estadoRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoestado);
     }
 
-    // Obtener usuario por ID
+    // Obtener Estado por ID
     @GetMapping("/{id}")
-    public ResponseEntity<Estado> obtenerEstadoPorId(@PathVariable Long id) {
-        Estado usuario = estadoService.obtenerEstadoPorId(id);
-        return ResponseEntity.ok(usuario);
+    public ResponseEntity<EstadoResponseDTO> obtenerEstadoPorId(@PathVariable Long id) {
+        EstadoResponseDTO estado = estadoService.findById(id);
+        return ResponseEntity.ok(estado);
     }
 
-    // Listar todos los ticket
+    // Listar todos los Estados
     @GetMapping
-    public ResponseEntity<List<Estado>> listarEstado() {
-        return ResponseEntity.ok(estadoService.listarEstados());
+    public ResponseEntity<List<EstadoResponseDTO>> listarEstados() {
+        List<EstadoResponseDTO> estados = estadoService.findAll();
+        return ResponseEntity.ok(estados);
     }
 
-    // Actualizar ticket
+    // Actualizar Estados
     @PutMapping("/{id}")
-    public ResponseEntity<Estado> actualizarEstado(@PathVariable Long id, @RequestBody Estado usuario) {
-        Estado usuarioActualizado = estadoService.actualizarEstado(id, usuario);
-        return ResponseEntity.ok(usuarioActualizado);
+    public ResponseEntity<EstadoResponseDTO> actualizarEstado(@PathVariable Long id,
+        @RequestBody EstadoRequestDTO estadoRequestDTO) {
+        EstadoResponseDTO estadoActualizado = estadoService.update(id, estadoRequestDTO);
+        return ResponseEntity.ok(estadoActualizado);
     }
 
-    // Eliminar ticket
+    // Eliminar Estado
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarEstado(@PathVariable Long id) {
-        estadoService.eliminarEstado(id);
+        estadoService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
-}   
+}

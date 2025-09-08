@@ -15,57 +15,61 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.soporteAtenciones.sistemaAtenciones.models.Comentario;
+import com.soporteAtenciones.sistemaAtenciones.dtos.tickets.ComentarioRequestDTO;
+import com.soporteAtenciones.sistemaAtenciones.dtos.tickets.ComentarioResponseDTO;
 import com.soporteAtenciones.sistemaAtenciones.service.ComentarioService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/comentarios")
 @CrossOrigin(origins = "http://localhost:4200")
 public class ComentarioController {
 
-
-  private final ComentarioService comentarioService;
+    private final ComentarioService comentarioService;
 
     public ComentarioController(ComentarioService comentarioService) {
         this.comentarioService = comentarioService;
     }
 
-    // Crear ticket
     @PostMapping
-    public ResponseEntity<Comentario> crearComentario(@RequestBody Comentario usuario) {
-        Comentario nuevoComentario = comentarioService.crearComentario(usuario);
+    public ResponseEntity<ComentarioResponseDTO> crearComentario(@Valid @RequestBody ComentarioRequestDTO request) {
+        ComentarioResponseDTO nuevoComentario = comentarioService.crearComentario(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoComentario);
     }
 
-    // Obtener usuario por ID
     @GetMapping("/{id}")
-    public ResponseEntity<Comentario> obtenerComentarioPorId(@PathVariable Long id) {
-        Comentario usuario = comentarioService.obtenerComentarioPorId(id);
-        return ResponseEntity.ok(usuario);
+    public ResponseEntity<ComentarioResponseDTO> obtenerComentarioPorId(@PathVariable Long id) {
+        ComentarioResponseDTO comentario = comentarioService.obtenerComentarioPorId(id);
+        return ResponseEntity.ok(comentario);
     }
 
-    // Listar todos los ticket
-      @GetMapping
-    public ResponseEntity<List<Comentario>> listarComentario(
-        @RequestParam(required = false) Long ticket) {
-        if (ticket != null) {
-            return ResponseEntity.ok(comentarioService.listarComentariosPorTicket(ticket));
-        } else {
-            return ResponseEntity.ok(comentarioService.listarComentarios());
-        }
-    }
+   // ComentarioController.java
 
-    // Actualizar ticket
+@GetMapping
+public ResponseEntity<List<ComentarioResponseDTO>> listarComentariosPorTicket(
+        @RequestParam(required = false) Long ticketId) {
+    if (ticketId != null) {
+        List<ComentarioResponseDTO> comentarios = comentarioService.listarComentariosPorTicket(ticketId);
+        return ResponseEntity.ok(comentarios);
+    } else {
+        // Si no se proporciona ticketId, devuelve todos los comentarios.
+        List<ComentarioResponseDTO> comentarios = comentarioService.listarTodosLosComentarios();
+        return ResponseEntity.ok(comentarios);
+    }
+}
+
     @PutMapping("/{id}")
-    public ResponseEntity<Comentario> actualizarComentario(@PathVariable Long id, @RequestBody Comentario usuario) {
-        Comentario usuarioActualizado = comentarioService.actualizarComentario(id, usuario);
-        return ResponseEntity.ok(usuarioActualizado);
+    public ResponseEntity<ComentarioResponseDTO> actualizarComentario(
+            @PathVariable Long id,
+            @Valid @RequestBody ComentarioRequestDTO request) {
+        ComentarioResponseDTO comentarioActualizado = comentarioService.actualizarComentario(id, request);
+        return ResponseEntity.ok(comentarioActualizado);
     }
 
-    // Eliminar ticket
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarComentario(@PathVariable Long id) {
         comentarioService.eliminarComentario(id);
         return ResponseEntity.noContent().build();
     }
-}   
+}
