@@ -5,11 +5,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class DistritoRequestDTO {
-
+public class TipoSubAreaRequest {
 @NotBlank(message = "El nombre no puede estar vacío")
     private String nombre;
     
-@NotNull(message = "El ID del Departamento no puede ser nulo")
-    private Long idProvincia;
+    @NotNull(message = "El ID del Area no puede ser nulo")
+    private Long idArea;
 }

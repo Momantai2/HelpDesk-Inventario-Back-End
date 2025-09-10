@@ -2,9 +2,9 @@ package com.soporteAtenciones.sistemaAtenciones.dtos.inventario;
 
 import lombok.Data;
 
-
 @Data
-public class ProvinciaResponseDTO {
-    private Long idProvincia;
+public class AreaResponseDTO {
+
+    private Long idArea;
     private String nombre;
 }

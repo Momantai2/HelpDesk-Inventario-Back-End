@@ -4,89 +4,69 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import com.soporteAtenciones.sistemaAtenciones.dtos.inventario.ProvinciaRequestDTO;
 import com.soporteAtenciones.sistemaAtenciones.dtos.inventario.ProvinciaResponseDTO;
-import com.soporteAtenciones.sistemaAtenciones.exception.DuplicateResourceException;
-import com.soporteAtenciones.sistemaAtenciones.exception.ResourceNotFoundException;
 import com.soporteAtenciones.sistemaAtenciones.mappers.ProvinciaMapper;
-import com.soporteAtenciones.sistemaAtenciones.models.inventario.Departamento;
 import com.soporteAtenciones.sistemaAtenciones.models.inventario.Provincia;
-import com.soporteAtenciones.sistemaAtenciones.repository.inventario.DepartamentoRepository;
 import com.soporteAtenciones.sistemaAtenciones.repository.inventario.ProvinciaRepository;
 
 @Service
 public class ProvinciaService {
 
-    private final ProvinciaRepository provinciaRepository;
-    private final DepartamentoRepository departamentoRepository;
+      private final ProvinciaRepository provinciaRepository;
     private final ProvinciaMapper provinciaMapper;
 
-    public ProvinciaService(ProvinciaRepository provinciaRepository,
-                            DepartamentoRepository departamentoRepository,
-                            ProvinciaMapper provinciaMapper) {
+    public ProvinciaService(ProvinciaRepository provinciaRepository, ProvinciaMapper provinciaMapper) {
         this.provinciaRepository = provinciaRepository;
-        this.departamentoRepository = departamentoRepository;
         this.provinciaMapper = provinciaMapper;
     }
 
-    @Transactional
-    public ProvinciaResponseDTO crearProvincia(ProvinciaRequestDTO request) {
-        if (provinciaRepository.existsByNombre(request.getNombre())) {
-            throw new DuplicateResourceException("Provincia", "nombre", request.getNombre());
-        }
-
-        // Validar departamento
-        Departamento departamento = departamentoRepository.findById(request.getDepartamentoId())
-                .orElseThrow(() -> new ResourceNotFoundException("Departamento", "id", request.getDepartamentoId()));
-
-        Provincia provincia = provinciaMapper.toEntity(request);
-        provincia.setDepartamento(departamento);
-
-        return provinciaMapper.toResponseDTO(provinciaRepository.save(provincia));
-    }
-
-    public ProvinciaResponseDTO obtenerProvinciaPorId(Long id) {
-        Provincia provincia = provinciaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Provincia", "id", id));
-
-        return provinciaMapper.toResponseDTO(provincia);
-    }
-
-    public List<ProvinciaResponseDTO> listarProvincias() {
-        return provinciaRepository.findAll()
-                .stream()
-                .map(provinciaMapper::toResponseDTO)
+    public List<ProvinciaResponseDTO> findAll() {
+        return provinciaRepository.findAll().stream()
+                .map(provinciaMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
 
-    @Transactional
-    public ProvinciaResponseDTO actualizarProvincia(Long id, ProvinciaRequestDTO request) {
-        Provincia existente = provinciaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Provincia", "id", id));
+    public ProvinciaResponseDTO findById(Long id) {
+        Provincia provincia = provinciaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Provincia no encontrado con id: " + id));
+        return provinciaMapper.toResponseDto(provincia);
+    }
+    
+ public List<ProvinciaResponseDTO> saveAll(List<ProvinciaRequestDTO> provinciaRequestDTOList) {
+    List<Provincia> provincias = provinciaRequestDTOList.stream()
+            .map(provinciaMapper::toEntity)
+            .collect(Collectors.toList());
 
-        // Validar duplicados en nombre
-        if (!existente.getNombre().equalsIgnoreCase(request.getNombre())
-                && provinciaRepository.existsByNombre(request.getNombre())) {
-            throw new DuplicateResourceException("Provincia", "nombre", request.getNombre());
-        }
+    List<Provincia> guardados = provinciaRepository.saveAll(provincias);
 
-        // Validar departamento
-        Departamento departamento = departamentoRepository.findById(request.getDepartamentoId())
-                .orElseThrow(() -> new ResourceNotFoundException("Departamento", "id", request.getDepartamentoId()));
+    return guardados.stream()
+            .map(provinciaMapper::toResponseDto)
+            .collect(Collectors.toList());
+}
 
-        existente.setNombre(request.getNombre());
-        existente.setDepartamento(departamento);
-
-        return provinciaMapper.toResponseDTO(provinciaRepository.save(existente));
+    public ProvinciaResponseDTO save(ProvinciaRequestDTO provinciaRequestDTO) {
+        // Validación o lógica de negocio antes de guardar
+        Provincia provincia = provinciaMapper.toEntity(provinciaRequestDTO);
+        Provincia savedprovincia = provinciaRepository.save(provincia);
+        return provinciaMapper.toResponseDto(savedprovincia);
     }
 
-    @Transactional
-    public void eliminarProvincia(Long id) {
-        Provincia existente = provinciaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Provincia", "id", id));
+    public ProvinciaResponseDTO update(Long id, ProvinciaRequestDTO provinciaRequestDTO) {
+        Provincia existingprovincia = provinciaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Provincia no encontrado con id: " + id));
+        
+        provinciaMapper.updateEntityFromDto(provinciaRequestDTO, existingprovincia);
+        Provincia updateprovincia = provinciaRepository.save(existingprovincia);
+        return provinciaMapper.toResponseDto(updateprovincia);
+    }
 
-        provinciaRepository.delete(existente);
+    public void deleteById(Long id) {
+        if (!provinciaRepository.existsById(id)) {
+            throw new RuntimeException("Provincia no encontrado con id: " + id);
+        }
+        provinciaRepository.deleteById(id);
     }
 }

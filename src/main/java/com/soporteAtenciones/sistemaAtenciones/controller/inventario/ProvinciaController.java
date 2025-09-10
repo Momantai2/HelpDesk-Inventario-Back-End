@@ -23,7 +23,7 @@ import com.soporteAtenciones.sistemaAtenciones.service.inventario.ProvinciaServi
 @CrossOrigin(origins = "http://localhost:4200")
 public class ProvinciaController {
 
-  private final ProvinciaService provinciaService;
+   private final ProvinciaService provinciaService;
 
     public ProvinciaController(ProvinciaService provinciaService) {
         this.provinciaService = provinciaService;
@@ -31,36 +31,43 @@ public class ProvinciaController {
 
     // Crear Provincia
     @PostMapping
-    public ResponseEntity<ProvinciaResponseDTO> crearProvincia(@RequestBody ProvinciaRequestDTO requestDTO) {
-        ProvinciaResponseDTO nuevaProvincia = provinciaService.crearProvincia(requestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevaProvincia);
+    public ResponseEntity<ProvinciaResponseDTO> crearProvincia(@RequestBody ProvinciaRequestDTO provinciaRequestDTO) {
+        ProvinciaResponseDTO nuevoprovincia = provinciaService.save(provinciaRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoprovincia);
     }
 
-    // Obtener Provincia por ID
+    // Obtener provincia por ID
     @GetMapping("/{id}")
     public ResponseEntity<ProvinciaResponseDTO> obtenerProvinciaPorId(@PathVariable Long id) {
-        ProvinciaResponseDTO provincia = provinciaService.obtenerProvinciaPorId(id);
+        ProvinciaResponseDTO provincia = provinciaService.findById(id);
         return ResponseEntity.ok(provincia);
     }
 
-    // Listar todas las Provincias
+    // Listar todos los provincias
     @GetMapping
     public ResponseEntity<List<ProvinciaResponseDTO>> listarProvincias() {
-        return ResponseEntity.ok(provinciaService.listarProvincias());
+        List<ProvinciaResponseDTO> provincias = provinciaService.findAll();
+        return ResponseEntity.ok(provincias);
     }
 
-    // Actualizar Provincia
+    // Actualizar provincia
     @PutMapping("/{id}")
     public ResponseEntity<ProvinciaResponseDTO> actualizarProvincia(@PathVariable Long id,
-                                                                    @RequestBody ProvinciaRequestDTO requestDTO) {
-        ProvinciaResponseDTO provinciaActualizada = provinciaService.actualizarProvincia(id, requestDTO);
-        return ResponseEntity.ok(provinciaActualizada);
+        @RequestBody ProvinciaRequestDTO provinciaRequestDTO) {
+        ProvinciaResponseDTO provinciaActualizado = provinciaService.update(id, provinciaRequestDTO);
+        return ResponseEntity.ok(provinciaActualizado);
     }
 
-    // Eliminar Provincia
+    // Eliminar provincia
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarProvincia(@PathVariable Long id) {
-        provinciaService.eliminarProvincia(id);
+        provinciaService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+      @PostMapping("/lote")
+public ResponseEntity<List<ProvinciaResponseDTO>> crearProvincias(@RequestBody List<ProvinciaRequestDTO> provincias) {
+    List<ProvinciaResponseDTO> nuevos = provinciaService.saveAll(provincias);
+    return ResponseEntity.status(HttpStatus.CREATED).body(nuevos);
+}
+
 }

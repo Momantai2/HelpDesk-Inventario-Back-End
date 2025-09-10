@@ -19,7 +19,8 @@ public interface UsuarioMapper {
     @Mapping(target = "rol", source = "idRol")
     Usuario toEntity(UsuarioRequestDTO dto);
 
-    @Mapping(target = "idRol", source = "rol.idRol")
+    @Mapping(target = "rol", source = "rol")
+    @Mapping(target = "nombrerol", source = "rol.nombre")
     UsuarioResponseDTO toResponseDto(Usuario usuario);
 
     default Rol mapTicket(Long idRol) {

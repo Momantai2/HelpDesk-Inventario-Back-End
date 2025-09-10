@@ -10,6 +10,7 @@ public class ComentarioResponseDTO {
     private Long idComentario;
     private String texto;
     private Long idTicket;
-    private Long idUsuario;
+     private String nombreusuarioactual;
+     private Long idUsuario;
     private LocalDateTime fechaCreacion;
 }

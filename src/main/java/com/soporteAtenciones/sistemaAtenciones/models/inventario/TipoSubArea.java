@@ -5,23 +5,30 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
-@Table(name ="Provincia")
-public class Provincia {
+@Table(name="tipoSubArea¨")
+ public class TipoSubArea {
 
-    @Id
+  @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idProvincia;
+    private Long idTipoSubArea;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String nombre;
 
+    @ManyToOne
+    @JoinColumn(name = "idArea", nullable = false)
+    private Area area;
+
 }
+    

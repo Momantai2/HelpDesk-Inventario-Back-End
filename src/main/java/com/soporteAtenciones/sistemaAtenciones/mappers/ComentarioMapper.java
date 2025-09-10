@@ -20,7 +20,8 @@ public interface ComentarioMapper {
     Comentario toEntity(ComentarioRequestDTO dto);
 
     @Mapping(target = "idTicket", source = "ticket.idTicket")
-    @Mapping(target = "idUsuario", source = "usuario.idUsuario")
+    @Mapping(target = "nombreusuarioactual", source = "usuario.nombre")
+        @Mapping(target = "idUsuario", source = "usuario.idUsuario")
     ComentarioResponseDTO toResponseDto(Comentario comentario);
 
     default Ticket mapTicket(Long idTicket) {

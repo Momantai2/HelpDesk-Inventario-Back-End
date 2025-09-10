@@ -10,18 +10,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name ="Provincia")
-public class Provincia {
+@Table(name="tipoSucursal")
+@Data
+public class TipoSucursal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idProvincia;
+    private Long idTipoSucursal;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String nombre;
 
+  
 }
+    
