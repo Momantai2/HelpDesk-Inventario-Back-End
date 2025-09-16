@@ -23,9 +23,9 @@ public interface TicketMapper {
     Ticket toEntity(TicketRequestDTO dto);
 
     // Mapeo de Entity a ResponseDTO
-    @Mapping(target = "estado", source = "estado")
-    @Mapping(target = "prioridad", source = "prioridad")
-    @Mapping(target = "usuario", source = "usuario") // ahora todo el objeto Usuario
+    @Mapping(target = "nombreEstado", source = "estado.nombre")
+    @Mapping(target = "nombrePrioridad", source = "prioridad.nombre")
+    @Mapping(target = "nombreUsuario", source = "usuario.nombre") // ahora todo el objeto Usuario
     TicketResponseDTO toResponseDto(Ticket ticket);
 
     default Estado mapEstado(Long idEstado) {
